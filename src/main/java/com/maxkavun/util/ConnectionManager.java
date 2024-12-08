@@ -8,11 +8,12 @@ public class ConnectionManager {
 
     private static final String URL_KEY = "db.url";
 
-    private ConnectionManager(){}
+    private ConnectionManager() {
+    }
 
-    public static Connection getConnection(){
-        try{
-            return DriverManager.getConnection(URL_KEY);
+    public static Connection getConnection() {
+        try {
+            return DriverManager.getConnection(PropertiesUtil.get(URL_KEY));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

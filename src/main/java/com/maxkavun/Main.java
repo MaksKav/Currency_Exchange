@@ -12,8 +12,6 @@ import java.util.Optional;
 
 public class Main {
     public static void main(String[] args) {
-        BigDecimal decimal = new BigDecimal("42.78");
-        ExchangeRate ex = new ExchangeRate(1, 6, decimal);
-        ExchangeRateDao.getInstance().save(ex);
+
     }
 }

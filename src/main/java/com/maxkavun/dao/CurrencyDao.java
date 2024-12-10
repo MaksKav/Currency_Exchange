@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CurrencyDao implements Dao<Integer, Currency> {
 
+    private static final Logger log = LoggerFactory.getLogger(CurrencyDao.class);
     private static final CurrencyDao INSTANCE = new CurrencyDao();
 
     private CurrencyDao() {
@@ -61,9 +64,11 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                 currencies.add(buildCurrency(resultSet));
             }
 
+            log.info("Fetched all currencies: {}" , currencies);
             return currencies.isEmpty() ? Collections.emptyList() : currencies;
 
         } catch (SQLException e) {
+            log.error("Error fetching all currencies", e);
             throw new RuntimeException(e);
         }
     }
@@ -76,6 +81,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                     resultSet.getObject("full_name", String.class),
                     resultSet.getObject("sign", String.class));
         } catch (SQLException e) {
+            log.error("Error building currency from result set", e);
             throw new RuntimeException(e);
         }
     }
@@ -89,11 +95,14 @@ public class CurrencyDao implements Dao<Integer, Currency> {
 
             try (var resultSet = prepareStatement.executeQuery()) {
                 if (resultSet.next()) {
+                    log.info("Currency found with id {}: {}", id, buildCurrency(resultSet));
                     return Optional.of(buildCurrency(resultSet));
                 }
+                log.info("No currency found with id {}", id);
                 return Optional.empty();
             }
         } catch (SQLException e) {
+            log.error("Error fetching currency with id {}", id, e);
             throw new RuntimeException(e);
         }
     }
@@ -115,9 +124,11 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                         model.setId(generatedKeys.getInt(1));
                     }
                 }
+                log.info("Currency saved successfully: {}", model);
             }
             return model;
         } catch (SQLException e) {
+            log.error("Error saving currency: {}", model, e);
             throw new RuntimeException(e);
         }
     }
@@ -129,8 +140,15 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             prepareStatement.setInt(1, id);
 
             int rows = prepareStatement.executeUpdate();
-            return rows > 0;
+            if (rows > 0) {
+                log.info("Currency with id {} deleted successfully", id);
+                return true;
+            }else {
+                log.warn("Currency with id {} not found", id);
+                return false;
+            }
         } catch (SQLException e) {
+            log.error("Error deleting currency with id {}", id, e);
             throw new RuntimeException(e);
         }
     }
@@ -145,6 +163,11 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             prepareStatement.setInt(4, model.getId());
 
             int rows = prepareStatement.executeUpdate();
+            if (rows > 0) {
+                log.info("Currency with id {} updated successfully: {}", model.getId(), model);
+            } else {
+                log.warn("No currency found with id {} to update", model.getId());
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

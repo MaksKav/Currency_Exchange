@@ -52,8 +52,9 @@ public class CurrencyDao implements Dao<Integer, Currency> {
 
     @Override
     public List<Currency> findAll() {
-        try (var connection = ConnectionManager.getConnection(); var prepareStatement = connection.prepareStatement(FIND_ALL_SQL)) {
-            var resultSet = prepareStatement.executeQuery();
+        try (var connection = ConnectionManager.getConnection();
+             var prepareStatement = connection.prepareStatement(FIND_ALL_SQL);
+             var resultSet = prepareStatement.executeQuery()) {
 
             List<Currency> currencies = new ArrayList<>();
             while (resultSet.next()) {
@@ -85,11 +86,13 @@ public class CurrencyDao implements Dao<Integer, Currency> {
         try (var connection = ConnectionManager.getConnection();
              var prepareStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             prepareStatement.setInt(1, id);
-            var resultSet = prepareStatement.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(buildCurrency(resultSet));
+
+            try (var resultSet = prepareStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(buildCurrency(resultSet));
+                }
+                return Optional.empty();
             }
-            return Optional.empty();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

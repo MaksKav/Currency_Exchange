@@ -24,6 +24,7 @@ public class ConnectionManager {
         config.setIdleTimeout(IDLE_TIMEOUT);
         config.setMaxLifetime(MAX_LIFETIME);
         config.setConnectionTimeout(CONNECTION_TIMEOUT);
+        config.setDriverClassName("org.sqlite.JDBC");
 
         dataSource = new HikariDataSource(config);
     }
@@ -33,9 +34,10 @@ public class ConnectionManager {
 
     public static Connection getConnection() {
         try {
+            Class.forName("org.sqlite.JDBC");
             return dataSource.getConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to get connection from HikariCP pool", e);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException("Failed to get connection from HikariCP pool ", e);
         }
     }
 }

@@ -35,6 +35,12 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                         WHERE id = ? ;
             """;
 
+    private static final String FIND_BY_CODE_SQL = """
+            SELECT id, code, full_name , sign
+            FROM Currencies
+            WHERE code = ? ;
+            """;
+
     private static final String SAVE_SQL = """
             INSERT INTO Currencies (code, full_name, sign)
             VALUES(? , ? , ?);
@@ -103,6 +109,25 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             }
         } catch (SQLException e) {
             log.error("Error fetching currency with id {}", id, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public Optional<Currency> findByCode(String code) {
+        try(var connection = ConnectionManager.getConnection();
+            var prepareStatement  = connection.prepareStatement(FIND_BY_CODE_SQL)){
+            prepareStatement.setString(1, code);
+
+            try (var resultSet = prepareStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    log.info("Currency found with code {}: {}", code, buildCurrency(resultSet));
+                    return Optional.of(buildCurrency(resultSet));
+                }
+                log.info("No currency found with code {}", code);
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

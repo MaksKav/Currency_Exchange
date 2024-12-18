@@ -28,11 +28,8 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        String pathInfo = request.getPathInfo();
         try{
+            String pathInfo = request.getPathInfo();
             if (pathInfo == null || pathInfo.equals("/")) {
                 List<CurrencyDto> currencies = currencyService.getAllCurrencies();
                 sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencies));
@@ -65,9 +62,6 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/x-www-form-urlencoded");
-        response.setCharacterEncoding("UTF-8");
-
         try{
             String name = request.getParameter("fullName");
             String code = request.getParameter("code").toUpperCase();
@@ -98,9 +92,6 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
         try {
             CurrencyDto currencyDto = gson.fromJson(request.getReader() , CurrencyDto.class);
 

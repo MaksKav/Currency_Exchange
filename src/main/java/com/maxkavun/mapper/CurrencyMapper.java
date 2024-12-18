@@ -17,7 +17,7 @@ public class CurrencyMapper implements ModelDtoMapper<Currency , CurrencyDto>{
     @Override
     public  CurrencyDto toDto(Currency model) throws ModelToDtoConversionException {
         if (model == null){
-            throw new ModelToDtoConversionException("Cannot convert model to DTO");
+            throw new ModelToDtoConversionException("Cannot convert model to DTO , model is null : " + model);
         }
         return new CurrencyDto(model.getId(), model.getCode(), model.getFullName(), model.getSign());
     }
@@ -25,7 +25,7 @@ public class CurrencyMapper implements ModelDtoMapper<Currency , CurrencyDto>{
     @Override
     public List<CurrencyDto> toDtoList(List<Currency> models) throws ModelToDtoConversionException {
         if (models == null || models.isEmpty()){
-            log.warn("Cannot convert models list to DTO");
+            log.warn("Cannot convert models list to DTO models is null or empty");
             return Collections.emptyList();
         }
         List<CurrencyDto> currencyDtoList = new ArrayList<>();
@@ -38,7 +38,7 @@ public class CurrencyMapper implements ModelDtoMapper<Currency , CurrencyDto>{
     @Override
     public Currency toModel(CurrencyDto dto) throws DtoToModelConversionException {
         if (dto == null){
-            throw new DtoToModelConversionException("Cannot convert DTO to model");
+            throw new DtoToModelConversionException("Cannot convert DTO to model , dto is null : " + dto);
         }
         return new Currency(dto.getId(), dto.getCode(), dto.getFullName(), dto.getSign());
     }

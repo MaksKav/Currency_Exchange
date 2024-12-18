@@ -1,5 +1,6 @@
 package com.maxkavun.dao;
 
+import com.maxkavun.exception.DataAccessException;
 import com.maxkavun.model.Currency;
 import com.maxkavun.util.ConnectionManager;
 
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,12 +73,13 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                 currencies.add(buildCurrency(resultSet));
             }
 
-            log.info("Fetched all currencies: {}" , currencies);
+            log.info("Fetched all currencies: {}", currencies);
             return currencies.isEmpty() ? Collections.emptyList() : currencies;
 
         } catch (SQLException e) {
             log.error("Error fetching all currencies", e);
-            throw new RuntimeException(e);
+            throw new DataAccessException("Failed to fetch all currencies from the database in FindAll method " + e.getMessage());
+
         }
     }
 
@@ -88,7 +92,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                     resultSet.getObject("sign", String.class));
         } catch (SQLException e) {
             log.error("Error building currency from result set", e);
-            throw new RuntimeException(e);
+            throw new DataAccessException("Failed to build currency from result set in buildCurrency method " + e.getMessage());
         }
     }
 
@@ -109,14 +113,14 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             }
         } catch (SQLException e) {
             log.error("Error fetching currency with id {}", id, e);
-            throw new RuntimeException(e);
+            throw new DataAccessException("Failed to fetch currency with id:  " + id + " " + e.getMessage());
         }
     }
 
 
     public Optional<Currency> findByCode(String code) {
-        try(var connection = ConnectionManager.getConnection();
-            var prepareStatement  = connection.prepareStatement(FIND_BY_CODE_SQL)){
+        try (var connection = ConnectionManager.getConnection();
+             var prepareStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
             prepareStatement.setString(1, code);
 
             try (var resultSet = prepareStatement.executeQuery()) {
@@ -128,7 +132,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                 return Optional.empty();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Failed to fetch currency with code: " + code + " " + e.getMessage());
         }
     }
 
@@ -154,7 +158,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             return model;
         } catch (SQLException e) {
             log.error("Error saving currency: {}", model, e);
-            throw new RuntimeException(e);
+            throw new DataAccessException("Failed to save currency: " + model + " " + e.getMessage());
         }
     }
 
@@ -168,13 +172,13 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             if (rows > 0) {
                 log.info("Currency with id {} deleted successfully", id);
                 return true;
-            }else {
+            } else {
                 log.warn("Currency with id {} not found", id);
                 return false;
             }
         } catch (SQLException e) {
             log.error("Error deleting currency with id {}", id, e);
-            throw new RuntimeException(e);
+            throw new DataAccessException("Failed to delete currency with id: " + id + " " + e.getMessage());
         }
     }
 
@@ -194,7 +198,7 @@ public class CurrencyDao implements Dao<Integer, Currency> {
                 log.warn("No currency found with id {} to update", model.getId());
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Failed to update currency with id: " + model.getId() + " " + e.getMessage());
         }
     }
 }

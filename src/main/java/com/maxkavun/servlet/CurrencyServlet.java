@@ -36,7 +36,7 @@ public class CurrencyServlet extends HttpServlet {
             if (pathInfo == null || pathInfo.equals("/")) {
                 List<CurrencyDto> currencies = currencyService.getAllCurrencies();
                 sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencies));
-                log.info("Successfully retrieved currencies in doGet.");
+                log.info("Successfully retrieved all currencies in doGet.");
             } else {
                 String code = pathInfo.substring(1);
                 code = code.toUpperCase();

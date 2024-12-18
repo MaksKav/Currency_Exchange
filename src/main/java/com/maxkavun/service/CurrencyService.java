@@ -53,24 +53,16 @@ public class CurrencyService {
     public void updateCurrency(CurrencyDto currencyDto) throws ValidationException, BusinessException, DtoToModelConversionException {
         Optional<Currency> optionalCurrency = currencyDao.findById(currencyDto.getId());
         if (!optionalCurrency.isPresent()) {
-            throw new BusinessException("Currency not found");
+            throw new BusinessException("Failed update Currency , Currency not found in DB " + currencyDto);
         }
         Currency currency = mapper.toModel(currencyDto);
         currencyDao.update(currency);
     }
 
-  /*  public void updateCurrency(Integer id, String fullName, String code, String sign) throws ValidationException, BusinessException {
-        Optional<Currency> existingCurrency = currencyDao.findById(id);
-        if (!existingCurrency.isPresent()) {
-            throw new BusinessException("Currency not found");
-        }
-        Currency currency = new Currency( id , code, fullName, sign);
-        currencyDao.update(currency);
-    }*/
 
     private void checkCurrencyUniqueness(String code) throws ValidationException {
         if (currencyDao.findByCode(code).isPresent()) {
-            throw new ValidationException("Currency with this code already exists");
+            throw new ValidationException("Currency with this code already exists " + code);
         }
     }
 

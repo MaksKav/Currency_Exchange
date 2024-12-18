@@ -1,6 +1,6 @@
 package com.maxkavun.exception;
 
-public abstract class ApplicationException extends Exception {
+public abstract class ApplicationException extends RuntimeException {
 
     public ApplicationException(String message) {
         super(message);

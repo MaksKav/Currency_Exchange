@@ -18,13 +18,8 @@ import org.slf4j.LoggerFactory;
 public class CurrencyDao implements Dao<Integer, Currency> {
 
     private static final Logger log = LoggerFactory.getLogger(CurrencyDao.class);
-    private static final CurrencyDao INSTANCE = new CurrencyDao();
 
-    private CurrencyDao() {
-    }
-
-    public static CurrencyDao getInstance() {
-        return INSTANCE;
+    public  CurrencyDao() {
     }
 
     private static final String FIND_ALL_SQL = """

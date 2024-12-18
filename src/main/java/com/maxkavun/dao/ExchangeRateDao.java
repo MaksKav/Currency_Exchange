@@ -16,13 +16,8 @@ import java.util.Optional;
 public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
 
     private static final Logger log = LoggerFactory.getLogger(ExchangeRateDao.class);
-    private static final ExchangeRateDao INSTANCE = new ExchangeRateDao();
 
-    private ExchangeRateDao() {
-    }
-
-    public static ExchangeRateDao getInstance() {
-        return INSTANCE;
+    public ExchangeRateDao() {
     }
 
     private static final String FIND_ALL_SQL = """

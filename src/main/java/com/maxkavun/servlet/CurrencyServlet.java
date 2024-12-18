@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @WebServlet("/currencies/*")
 public class CurrencyServlet extends HttpServlet {
-    private final CurrencyService currencyService  = CurrencyService.getInstance();
+    private final CurrencyService currencyService  = new CurrencyService();
     private final Gson gson = new Gson();
     private static final Logger log = LoggerFactory.getLogger(CurrencyServlet.class);
 

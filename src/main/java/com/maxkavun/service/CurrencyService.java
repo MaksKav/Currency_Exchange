@@ -13,18 +13,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class CurrencyService {
-    private final CurrencyDao currencyDao = CurrencyDao.getInstance();
+    private final CurrencyDao currencyDao = new CurrencyDao();
     private final CurrencyMapper mapper = new CurrencyMapper();
 
-    private static final CurrencyService INSTANCE = new CurrencyService();
 
-    private CurrencyService (){
+    public CurrencyService (){
     }
-
-    public static CurrencyService getInstance() {
-        return INSTANCE;
-    }
-
 
     public Optional<CurrencyDto> getOptionalCurrencyByCode(String code) throws BusinessException, ModelToDtoConversionException {
         Optional<Currency> currencyOptional = currencyDao.findByCode(code);

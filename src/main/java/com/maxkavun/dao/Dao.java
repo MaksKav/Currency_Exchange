@@ -14,5 +14,7 @@ public interface Dao<K, T> {
     void update(T model);
 
     T save(T model);
+
+    Optional<T> findByCode(String code);
 }
 

@@ -24,6 +24,19 @@ public class CurrencyDto {
     public CurrencyDto() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CurrencyDto that = (CurrencyDto) o;
+        return id == that.id && Objects.equals(code, that.code) && Objects.equals(fullName, that.fullName) && Objects.equals(sign, that.sign);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, code, fullName, sign);
+    }
+
     public int getId() {
         return id;
     }
@@ -64,18 +77,5 @@ public class CurrencyDto {
                ", fullName='" + fullName + '\'' +
                ", sign='" + sign + '\'' +
                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CurrencyDto that = (CurrencyDto) o;
-        return id == that.id && Objects.equals(code, that.code) && Objects.equals(fullName, that.fullName) && Objects.equals(sign, that.sign);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, code, fullName, sign);
     }
 }

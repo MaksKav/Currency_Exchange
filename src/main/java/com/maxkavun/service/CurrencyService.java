@@ -20,6 +20,12 @@ public class CurrencyService {
     public CurrencyService (){
     }
 
+    public List<CurrencyDto> getAllCurrencies() throws ModelToDtoConversionException {
+        List<Currency> currencies = currencyDao.findAll();
+        return mapper.toDtoList(currencies);
+    }
+
+
     public Optional<CurrencyDto> getOptionalCurrencyByCode(String code) throws BusinessException, ModelToDtoConversionException {
         Optional<Currency> currencyOptional = currencyDao.findByCode(code);
         if (currencyOptional.isPresent()) {
@@ -28,12 +34,6 @@ public class CurrencyService {
         }else {
             return Optional.empty();
         }
-    }
-
-
-    public List<CurrencyDto> getAllCurrencies() throws ModelToDtoConversionException {
-        List<Currency> currencies = currencyDao.findAll();
-        return mapper.toDtoList(currencies);
     }
 
 

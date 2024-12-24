@@ -1,25 +1,44 @@
 package com.maxkavun.service;
 
+import com.maxkavun.dao.CurrencyDao;
 import com.maxkavun.dao.ExchangeRateDao;
 import com.maxkavun.dto.ExchangeRateDto;
 import com.maxkavun.mapper.ExchangeRateMapper;
+import com.maxkavun.model.Currency;
 import com.maxkavun.model.ExchangeRate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class ExchangeRateService {
     private final ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
     private final ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
+    private final CurrencyDao currencyDao = new CurrencyDao();
+
 
     public List<ExchangeRateDto> getAllExchangeRates() {
-        List<ExchangeRate> exchangeRates  = exchangeRateDao.findAll();
-        return exchangeRateMapper.toDtoList(exchangeRates);
+        List<ExchangeRateDto> exchangeRateDtoList = new ArrayList<>();
+        for (ExchangeRate exchangeRate : exchangeRateDao.findAll()) {
+            mapToDtoWithCurrencies(exchangeRate).ifPresent(exchangeRateDtoList::add);
+        }
+        return exchangeRateDtoList;
     }
 
+
     public Optional<ExchangeRateDto> getExchangeRateByCode(String code) {
-        Optional<ExchangeRate> exchangeRate = exchangeRateDao.findByCode(code);
-        return exchangeRate.map(exchangeRateMapper::toDto);
+        return exchangeRateDao.findByCode(code)
+                .flatMap(this::mapToDtoWithCurrencies);
+    }
+
+
+    private Optional<ExchangeRateDto> mapToDtoWithCurrencies(ExchangeRate exchangeRate) {
+        Optional<Currency> baseCurrency = currencyDao.findById(exchangeRate.getBaseCurrencyId());
+        Optional<Currency> targetCurrency = currencyDao.findById(exchangeRate.getTargetCurrencyId());
+        if (baseCurrency.isPresent() && targetCurrency.isPresent()) {
+            return Optional.of(exchangeRateMapper.toDto(exchangeRate, baseCurrency.get(), targetCurrency.get()));
+        }
+        return Optional.empty();
     }
 
 

@@ -12,10 +12,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class ExchangeRateService {
-    private final ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
-    private final ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
-    private final CurrencyDao currencyDao = new CurrencyDao();
+    private final ExchangeRateDao exchangeRateDao ;
+    private final ExchangeRateMapper exchangeRateMapper ;
+    private final CurrencyDao currencyDao ;
 
+    public ExchangeRateService(ExchangeRateDao exchangeRateDao, ExchangeRateMapper exchangeRateMapper, CurrencyDao currencyDao) {
+        this.exchangeRateDao = exchangeRateDao;
+        this.exchangeRateMapper = exchangeRateMapper;
+        this.currencyDao = currencyDao;
+    }
 
     public List<ExchangeRateDto> getAllExchangeRates() {
         List<ExchangeRateDto> exchangeRateDtoList = new ArrayList<>();

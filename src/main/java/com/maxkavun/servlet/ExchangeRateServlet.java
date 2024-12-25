@@ -2,6 +2,7 @@ package com.maxkavun.servlet;
 
 import com.google.gson.Gson;
 import com.maxkavun.dto.ExchangeRateDto;
+import com.maxkavun.factory.ExchangeRateServiceFactory;
 import com.maxkavun.service.ExchangeRateService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,7 +17,7 @@ import java.util.Optional;
 
 @WebServlet("/exchangeRates/*")
 public class ExchangeRateServlet extends HttpServlet {
-    private final ExchangeRateService exchangeRateService = new ExchangeRateService();
+    private final ExchangeRateService exchangeRateService  = ExchangeRateServiceFactory.createExchangeRateService();
     private final Gson gson = new Gson();
     private static final Logger log = LoggerFactory.getLogger(ExchangeRateServlet.class);
 

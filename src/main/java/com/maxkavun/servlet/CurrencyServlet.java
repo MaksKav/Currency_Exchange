@@ -6,6 +6,7 @@ import com.maxkavun.exception.BusinessException;
 import com.maxkavun.exception.ModelToDtoConversionException;
 import com.maxkavun.exception.ValidationException;
 import com.maxkavun.service.CurrencyService;
+import com.maxkavun.util.ResponceUtil;
 import com.maxkavun.validator.CurrencyValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,7 +33,7 @@ public class CurrencyServlet extends HttpServlet {
             String pathInfo = request.getPathInfo();
             if (pathInfo == null || pathInfo.equals("/")) {
                 List<CurrencyDto> currencies = currencyService.getAllCurrencies();
-                sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencies));
+                ResponceUtil.sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencies));
                 log.info("Successfully retrieved all currencies in doGet.");
             } else {
                 String code = pathInfo.substring(1);
@@ -40,21 +41,21 @@ public class CurrencyServlet extends HttpServlet {
                 Optional<CurrencyDto> currencyDto = currencyService.getOptionalCurrencyByCode(code);
 
                 if (currencyDto.isPresent() ) {
-                    sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencyDto));
+                    ResponceUtil.sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencyDto));
                     log.info("Successfully retrieved currencyOptional by code: {}" , code);
                 } else {
-                    sendResponse(response , HttpServletResponse.SC_NOT_FOUND , "Not found currency");
+                    ResponceUtil.sendResponse(response , HttpServletResponse.SC_NOT_FOUND , "Not found currency");
                     log.warn("Currency not found: {}", code);
                 }
             }
         } catch (IOException e) {
-            sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
             log.error("Error while retrieving currencies.", e);
         } catch (ModelToDtoConversionException e) {
-            sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
             log.error("Error while retrieving currencies in ModelToDtoConversation." , e );
         } catch (BusinessException e) {
-            sendResponse(response , HttpServletResponse.SC_BAD_REQUEST ,e.getMessage() );
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST ,e.getMessage() );
             log.error("Error while retrieving currencies in BusinessException." , e );
         }
     }
@@ -68,23 +69,23 @@ public class CurrencyServlet extends HttpServlet {
             String sign = request.getParameter("sign");
 
             if (!CurrencyValidator.validateCurrencyData(name , code, sign)) {
-                sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Invalid currency data");
+                ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Invalid currency data");
                 log.warn("The required form field is missing in Currency POST request.");
                 return;
             }
 
             if (currencyService.getOptionalCurrencyByCode(code).isPresent()) {
-                sendResponse(response , HttpServletResponse.SC_CONFLICT , "Currency already exists");
+                ResponceUtil.sendResponse(response , HttpServletResponse.SC_CONFLICT , "Currency already exists");
                 log.warn("Currency with this code: {}  already exists" , code);
                 return;
             }
 
             CurrencyDto currencyDto = new CurrencyDto(code, name, sign);
             currencyService.addCurrency(currencyDto);
-            sendResponse(response , HttpServletResponse.SC_CREATED , gson.toJson(currencyDto));
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_CREATED , gson.toJson(currencyDto));
             log.info("Successfully created currency: {}", currencyDto.getCode());
         }catch (Exception e) {
-            sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage());
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage());
             log.error("Error while creating currency from POST ", e);
         }
     }
@@ -96,29 +97,26 @@ public class CurrencyServlet extends HttpServlet {
             CurrencyDto currencyDto = gson.fromJson(request.getReader() , CurrencyDto.class);
 
             if (!CurrencyValidator.validateCurrencyData(currencyDto.getFullName(), currencyDto.getCode(), currencyDto.getSign())) {
-                sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data: one or more fields are incorrect.");
+                ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data: one or more fields are incorrect.");
                 log.warn("Validation failed for currency: {}", gson.toJson(currencyDto));
                 return;
             }
 
             currencyService.updateCurrency(currencyDto);
-            sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencyDto));
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencyDto));
             log.info("Successfully updated currency: {}", currencyDto.getCode());
         } catch (ValidationException e) {
-            sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , e.getMessage());
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , e.getMessage());
             log.warn("Validation error: {}", e.getMessage());
         } catch (BusinessException e) {
-            sendResponse(response , HttpServletResponse.SC_NOT_FOUND , e.getMessage());
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_NOT_FOUND , e.getMessage());
             log.warn("Business logic error: {}", e.getMessage());
         } catch (Exception e) {
-            sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
+            ResponceUtil.sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
             log.error("Error while updating currency", e);
         }
     }
 
-    private void sendResponse(HttpServletResponse response, int status, String message) throws IOException {
-        response.setStatus(status);
-        response.getWriter().write(message);
-    }
+
 
 }

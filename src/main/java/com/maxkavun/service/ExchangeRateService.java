@@ -5,6 +5,7 @@ import com.maxkavun.dao.ExchangeRateDao;
 import com.maxkavun.dto.ExchangeRateDto;
 import com.maxkavun.exception.BusinessException;
 import com.maxkavun.exception.CurrencyNotFoundException;
+import com.maxkavun.exception.ExchangeRateAlreadyExistsException;
 import com.maxkavun.mapper.ExchangeRateMapper;
 import com.maxkavun.model.Currency;
 import com.maxkavun.model.ExchangeRate;
@@ -45,19 +46,41 @@ public class ExchangeRateService {
         Currency targetCurrency = currencyDao.findByCode(targetCurrencyCode)
                 .orElseThrow(() -> new CurrencyNotFoundException("Target currency not found in database " + targetCurrencyCode));
 
-        String baseAndTargetCode = baseCurrencyCode + targetCurrencyCode;
+        String baseAndTargetCode = baseCurrencyCode + targetCurrencyCode; //TODO если пытаюсь добавить уже существующую валюту - дает неправильную ошибку
         Optional<ExchangeRate> exchangeRateDto = exchangeRateDao.findByCode(baseAndTargetCode);
         if (exchangeRateDto.isPresent()){
-            throw new BusinessException("This exchange rate is exist " + exchangeRateDto.get());
+            throw new ExchangeRateAlreadyExistsException("This exchange rate is exist " + baseAndTargetCode);
         }
 
         ExchangeRate exchangeRate = exchangeRateDao.save(new ExchangeRate(baseCurrency.getId() , targetCurrency.getId(), rate));
         return exchangeRateMapper.toDto(exchangeRate , baseCurrency , targetCurrency);
-
     }
 
 
-    private Optional<ExchangeRateDto> mapToDtoWithCurrencies(ExchangeRate exchangeRate) {
+    public ExchangeRateDto updateExchangeRate(String baseAndTargetCurrencyCode, BigDecimal rate){
+       Optional<ExchangeRate> exchangeRateOptional = exchangeRateDao.findByCode(baseAndTargetCurrencyCode);
+       if (exchangeRateOptional.isPresent()){
+           ExchangeRate exchangeRate = exchangeRateOptional.get();
+           exchangeRate.setRate(rate);
+           exchangeRateDao.update(exchangeRate);
+
+
+        Optional<ExchangeRate> updatedExchangeRateOptional = exchangeRateDao.findByCode(baseAndTargetCurrencyCode);
+           if (updatedExchangeRateOptional.isPresent()){
+               ExchangeRate updatedExchangeRate = updatedExchangeRateOptional.get();
+               Optional <ExchangeRateDto> exchangeRateDtoOptional = mapToDtoWithCurrencies(updatedExchangeRate);
+               if (exchangeRateDtoOptional.isPresent()){
+                   return exchangeRateDtoOptional.get();
+               }
+           }
+       } else {
+           throw new CurrencyNotFoundException("Currency not found in database " + baseAndTargetCurrencyCode);
+       }
+        throw new BusinessException("This exchange rate is not exist " );
+    }
+
+
+    public Optional<ExchangeRateDto> mapToDtoWithCurrencies(ExchangeRate exchangeRate) {
         Optional<Currency> baseCurrency = currencyDao.findById(exchangeRate.getBaseCurrencyId());
         Optional<Currency> targetCurrency = currencyDao.findById(exchangeRate.getTargetCurrencyId());
         if (baseCurrency.isPresent() && targetCurrency.isPresent()) {
@@ -65,6 +88,5 @@ public class ExchangeRateService {
         }
         return Optional.empty();
     }
-
 
 }

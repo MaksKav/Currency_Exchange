@@ -23,9 +23,6 @@ public class ExchangeRateDto {
         this.rate = rate;
     }
 
-    public ExchangeRateDto() {
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,13 +1,11 @@
 package com.maxkavun.dao;
 
-import com.maxkavun.dto.CurrencyDto;
+import com.maxkavun.exception.ApplicationException;
 import com.maxkavun.exception.DataAccessException;
-import com.maxkavun.model.Currency;
 import com.maxkavun.model.ExchangeRate;
 import com.maxkavun.util.ConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,35 +57,28 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
             WHERE id = ?;
             """;
 
+
     @Override
     public Optional<ExchangeRate> findByCode(String code) {
-        try (var connection = ConnectionManager.getConnection();
-             var prepareStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
+        try (var connection = ConnectionManager.getConnection(); var prepareStatement = connection.prepareStatement(FIND_BY_CODE_SQL)) {
             String baseCurrencyCode = code.substring(0, 3);
             String targetCurrencyCode = code.substring(3);
             prepareStatement.setString(1, baseCurrencyCode);
             prepareStatement.setString(2, targetCurrencyCode);
             try (var resultSet = prepareStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(new ExchangeRate(
-                            resultSet.getObject("id", Integer.class),
-                            resultSet.getObject("base_currency_id", Integer.class),
-                            resultSet.getObject("target_currency_id", Integer.class),
-                            resultSet.getObject("rate", BigDecimal.class)
-                    ));
-                }
-            }
+                    return Optional.of(new ExchangeRate(resultSet.getObject("id", Integer.class), resultSet.getObject("base_currency_id", Integer.class), resultSet.getObject("target_currency_id", Integer.class), resultSet.getObject("rate", BigDecimal.class)));
+                }else {
+                    return Optional.empty();
+                }            }
         } catch (SQLException e) {
             throw new DataAccessException("Exception while fetching exchange rate from database", e);
         }
-        return Optional.empty();
     }
 
     @Override
     public List<ExchangeRate> findAll() {
-        try (var connection = ConnectionManager.getConnection();
-             var prepareStatement = connection.prepareStatement(FIND_ALL_SQL);
-             var resultSet = prepareStatement.executeQuery()) {
+        try (var connection = ConnectionManager.getConnection(); var prepareStatement = connection.prepareStatement(FIND_ALL_SQL); var resultSet = prepareStatement.executeQuery()) {
 
             List<ExchangeRate> exchangeRates = new ArrayList<>();
             while (resultSet.next()) {
@@ -103,11 +94,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
 
     private ExchangeRate buildExchangeRate(ResultSet resultSet) {
         try {
-            return new ExchangeRate(
-                    resultSet.getObject("id", Integer.class),
-                    resultSet.getObject("base_currency_id", Integer.class),
-                    resultSet.getObject("target_currency_id", Integer.class),
-                    resultSet.getObject("rate", BigDecimal.class));
+            return new ExchangeRate(resultSet.getObject("id", Integer.class), resultSet.getObject("base_currency_id", Integer.class), resultSet.getObject("target_currency_id", Integer.class), resultSet.getObject("rate", BigDecimal.class));
         } catch (SQLException e) {
             log.error("Failed to build exchangeRate: ", e);
             throw new RuntimeException(e);
@@ -117,8 +104,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
 
     @Override
     public Optional<ExchangeRate> findById(Integer id) {
-        try (var connection = ConnectionManager.getConnection();
-             var prepareStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+        try (var connection = ConnectionManager.getConnection(); var prepareStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             prepareStatement.setInt(1, id);
 
             try (var resultSet = prepareStatement.executeQuery()) {
@@ -138,8 +124,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
 
     @Override
     public ExchangeRate save(ExchangeRate model) {
-        try (var connection = ConnectionManager.getConnection();
-             var prepareStatement = connection.prepareStatement(SAVE_SQL)) {
+        try (var connection = ConnectionManager.getConnection(); var prepareStatement = connection.prepareStatement(SAVE_SQL)) {
             prepareStatement.setInt(1, model.getBaseCurrencyId());
             prepareStatement.setInt(2, model.getTargetCurrencyId());
             prepareStatement.setBigDecimal(3, model.getRate());
@@ -165,8 +150,7 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
 
     @Override
     public void update(ExchangeRate model) {
-        try (var connection = ConnectionManager.getConnection();
-             var prepareStatement = connection.prepareStatement(UPDATE_BY_ID_SQL)) {
+        try (var connection = ConnectionManager.getConnection(); var prepareStatement = connection.prepareStatement(UPDATE_BY_ID_SQL)) {
             prepareStatement.setInt(1, model.getBaseCurrencyId());
             prepareStatement.setInt(2, model.getTargetCurrencyId());
             prepareStatement.setBigDecimal(3, model.getRate());
@@ -181,15 +165,15 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
 
         } catch (SQLException e) {
             log.error("Failed to update exchangeRate: ", e);
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.getMessage()) {
+            };
         }
     }
 
 
     @Override
     public boolean deleteById(Integer id) {
-        try (var connection = ConnectionManager.getConnection();
-             var prepareStatement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
+        try (var connection = ConnectionManager.getConnection(); var prepareStatement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
             prepareStatement.setInt(1, id);
 
             int rows = prepareStatement.executeUpdate();
@@ -202,7 +186,8 @@ public class ExchangeRateDao implements Dao<Integer, ExchangeRate> {
             }
         } catch (SQLException e) {
             log.error("Failed to delete exchangeRate: ", e);
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.getMessage()) {
+            };
         }
     }
 }

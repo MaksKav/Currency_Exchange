@@ -8,6 +8,8 @@ import com.maxkavun.model.ExchangeRate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public class ExchangeRateMapper {
     private static final Logger log = LoggerFactory.getLogger(ExchangeRateMapper.class);
     private final CurrencyMapper currencyMapper= new CurrencyMapper();
@@ -28,6 +30,8 @@ public class ExchangeRateMapper {
                 model.getRate()
         );
     }
+
+
 
 
     public ExchangeRate toModel(ExchangeRateDto dto) throws DtoToModelConversionException {

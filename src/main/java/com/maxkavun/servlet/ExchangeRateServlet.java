@@ -2,7 +2,6 @@ package com.maxkavun.servlet;
 
 import com.google.gson.Gson;
 import com.maxkavun.dto.ExchangeRateDto;
-import com.maxkavun.exception.BusinessException;
 import com.maxkavun.exception.CurrencyNotFoundException;
 import com.maxkavun.exception.ExchangeRateAlreadyExistsException;
 import com.maxkavun.factory.ExchangeRateServiceFactory;
@@ -85,11 +84,11 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try{
+        try {
             String path = request.getPathInfo().substring(1).toUpperCase();
             BigDecimal rate = new BigDecimal(request.getParameter("rate"));
 
-            ExchangeRateDto exchangeRateDto = exchangeRateService.updateExchangeRate(path , rate);
+            ExchangeRateDto exchangeRateDto = exchangeRateService.updateExchangeRate(path, rate);
             log.info("Successfully updated exchange rate: {}", exchangeRateDto);
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto));
 
@@ -98,7 +97,4 @@ public class ExchangeRateServlet extends HttpServlet {
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-
-
-
 }

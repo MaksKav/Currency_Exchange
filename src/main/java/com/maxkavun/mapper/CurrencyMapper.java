@@ -19,7 +19,7 @@ public class CurrencyMapper {
         if (model == null){
             throw new ModelToDtoConversionException("Cannot convert model to DTO , Currency model is null");
         }
-        return new CurrencyDto(model.getId(), model.getCode(), model.getFullName(), model.getSign());
+        return new CurrencyDto(model.getId(), model.getFullName(),model.getCode(), model.getSign());
     }
 
 
@@ -40,6 +40,6 @@ public class CurrencyMapper {
         if (dto == null){
             throw new DtoToModelConversionException("Cannot convert DTO to model , dto is null");
         }
-        return new Currency(dto.getId(), dto.getCode(), dto.getFullName(), dto.getSign());
+        return new Currency(dto.getId(),  dto.getName(),dto.getCode(), dto.getSign());
     }
 }

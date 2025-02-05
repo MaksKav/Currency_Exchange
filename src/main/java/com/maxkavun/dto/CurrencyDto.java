@@ -4,20 +4,20 @@ import java.util.Objects;
 
 public class CurrencyDto {
     private int id;
+    private String name;
     private String code;
-    private String fullName;
     private String sign;
 
-    public CurrencyDto(int id, String code, String fullName, String sign) {
+    public CurrencyDto(int id, String name,String code,  String sign) {
         this.id = id;
+        this.name = name;
         this.code = code;
-        this.fullName = fullName;
         this.sign = sign;
     }
 
-    public CurrencyDto(String code, String fullName, String sign) {
+    public CurrencyDto(String name, String code, String sign) {
+        this.name = name;
         this.code = code;
-        this.fullName = fullName;
         this.sign = sign;
     }
 
@@ -29,12 +29,12 @@ public class CurrencyDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CurrencyDto that = (CurrencyDto) o;
-        return id == that.id && Objects.equals(code, that.code) && Objects.equals(fullName, that.fullName) && Objects.equals(sign, that.sign);
+        return id == that.id && Objects.equals(code, that.code) && Objects.equals(name, that.name) && Objects.equals(sign, that.sign);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, code, fullName, sign);
+        return Objects.hash(id, code, name, sign);
     }
 
     public int getId() {
@@ -53,12 +53,12 @@ public class CurrencyDto {
         this.code = code;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getName() {
+        return name;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getSign() {
@@ -73,8 +73,8 @@ public class CurrencyDto {
     public String toString() {
         return "CurrencyDto{" +
                "id=" + id +
+               ", name='" + name + '\'' +
                ", code='" + code + '\'' +
-               ", fullName='" + fullName + '\'' +
                ", sign='" + sign + '\'' +
                '}';
     }

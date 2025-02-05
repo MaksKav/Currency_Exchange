@@ -39,7 +39,7 @@ public class CurrencyService {
 
     public void addCurrency(CurrencyDto currencyDto) throws ValidationException {
         checkCurrencyUniqueness(currencyDto.getCode());
-        Currency currency = new Currency(currencyDto.getId(), currencyDto.getCode(), currencyDto.getFullName() ,currencyDto.getSign());
+        Currency currency = new Currency(currencyDto.getId(), currencyDto.getCode(), currencyDto.getName() ,currencyDto.getSign());
         currencyDao.save(currency);
     }
 

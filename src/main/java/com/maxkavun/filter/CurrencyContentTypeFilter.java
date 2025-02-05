@@ -27,3 +27,4 @@ public class CurrencyContentTypeFilter implements Filter {
 
     }
 }
+

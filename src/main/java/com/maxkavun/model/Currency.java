@@ -5,20 +5,20 @@ import java.util.Objects;
 public class Currency {
 
     private Integer id;
-    private String code;
     private String fullName;
+    private String code;
     private String sign;
 
     public Currency(Integer id, String code, String fullName, String sign) {
         this.id = id;
-        this.code = code;
         this.fullName = fullName;
+        this.code = code;
         this.sign = sign;
     }
 
     public Currency(String code, String fullName, String sign) {
-        this.code = code;
         this.fullName = fullName;
+        this.code = code;
         this.sign = sign;
     }
 
@@ -29,8 +29,8 @@ public class Currency {
     public String toString() {
         return "Currency{" +
                "id=" + id +
-               ", code='" + code + '\'' +
                ", fullName='" + fullName + '\'' +
+               ", code='" + code + '\'' +
                ", sign='" + sign + '\'' +
                '}';
     }

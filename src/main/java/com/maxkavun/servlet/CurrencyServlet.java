@@ -96,7 +96,7 @@ public class CurrencyServlet extends HttpServlet {
         try {
             CurrencyDto currencyDto = gson.fromJson(request.getReader() , CurrencyDto.class);
 
-            if (!CurrencyValidator.validateCurrencyData(currencyDto.getFullName(), currencyDto.getCode(), currencyDto.getSign())) {
+            if (!CurrencyValidator.validateCurrencyData(currencyDto.getName(), currencyDto.getCode(), currencyDto.getSign())) {
                 ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data: one or more fields are incorrect.");
                 log.warn("Validation failed for currency: {}", gson.toJson(currencyDto));
                 return;

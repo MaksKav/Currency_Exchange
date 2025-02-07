@@ -17,7 +17,7 @@ public class CurrencyService {
     private final CurrencyMapper mapper = new CurrencyMapper();
 
 
-    public CurrencyService (){
+    public CurrencyService() {
     }
 
     public List<CurrencyDto> getAllCurrencies() throws ModelToDtoConversionException {
@@ -31,7 +31,7 @@ public class CurrencyService {
         if (currencyOptional.isPresent()) {
             Currency currency = currencyOptional.get();
             return Optional.of(mapper.toDto(currency));
-        }else {
+        } else {
             return Optional.empty();
         }
     }
@@ -39,13 +39,13 @@ public class CurrencyService {
 
     public void addCurrency(CurrencyDto currencyDto) throws ValidationException {
         checkCurrencyUniqueness(currencyDto.getCode());
-        Currency currency = new Currency(currencyDto.getId(), currencyDto.getCode(), currencyDto.getName() ,currencyDto.getSign());
+        Currency currency = new Currency(currencyDto.getId(), currencyDto.getName(), currencyDto.getCode(), currencyDto.getSign());
         currencyDao.save(currency);
     }
 
 
     public void updateCurrency(CurrencyDto currencyDto) throws ValidationException, BusinessException, DtoToModelConversionException {
-        Optional<Currency> optionalCurrency = currencyDao.findById(currencyDto.getId());
+        Optional<Currency> optionalCurrency = currencyDao.findByCode(currencyDto.getCode());
         if (!optionalCurrency.isPresent()) {
             throw new BusinessException("Failed update Currency , Currency not found in DB " + currencyDto);
         }

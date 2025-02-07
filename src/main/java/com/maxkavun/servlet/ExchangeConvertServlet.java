@@ -3,8 +3,9 @@ package com.maxkavun.servlet;
 import com.google.gson.Gson;
 import com.maxkavun.dto.ExchangeConvertDto;
 import com.maxkavun.dto.ExchangeConvertDtoCustom;
-import com.maxkavun.dto.ExchangeConvertErrorResponse;
+import com.maxkavun.dto.ExchangeErrorResponse;
 import com.maxkavun.exception.BusinessException;
+import com.maxkavun.exception.CurrencyNotFoundException;
 import com.maxkavun.exception.DataAccessException;
 import com.maxkavun.factory.ExchangeRateServiceFactory;
 import com.maxkavun.service.ExchangeRateService;
@@ -38,10 +39,19 @@ public class ExchangeConvertServlet extends HttpServlet {
             ExchangeConvertDto resultExchange = exchangeRateService.calculateExchange(fromCurrency, toCurrency, amount);
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(new ExchangeConvertDtoCustom(resultExchange)));
 
+        }catch (NumberFormatException e ){
+            log.error(e.getMessage());
+            String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
+            ResponceUtil.sendResponse(response,HttpServletResponse.SC_BAD_REQUEST , errorMessage);
+        } catch (CurrencyNotFoundException e) {
+            log.error(e.getMessage());
+            String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
+            ResponceUtil.sendResponse(response,HttpServletResponse.SC_NOT_FOUND , errorMessage);
         } catch (IOException | BusinessException  |DataAccessException e) {
             log.error(e.getMessage());
-            String errorMessage =  gson.toJson(new ExchangeConvertErrorResponse(e.getMessage()));
+            String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage);
         }
+
     }
 }

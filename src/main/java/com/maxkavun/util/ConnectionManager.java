@@ -1,7 +1,9 @@
 package com.maxkavun.util;
 
+import com.maxkavun.exception.ConnectionException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -29,7 +31,8 @@ public class ConnectionManager {
         dataSource = new HikariDataSource(config);
     }
 
-    private ConnectionManager() {}
+    private ConnectionManager() {
+    }
 
 
     public static Connection getConnection() {
@@ -37,7 +40,7 @@ public class ConnectionManager {
             Class.forName("org.sqlite.JDBC");
             return dataSource.getConnection();
         } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException("Failed to get connection from HikariCP pool ", e);
+            throw new ConnectionException("Failed to get connection from HikariCP pool ", e) ;
         }
     }
 }

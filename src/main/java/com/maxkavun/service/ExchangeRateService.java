@@ -138,8 +138,9 @@ public class ExchangeRateService {
         }
 
         CurrencyDto temp = exchangeRateDto.get().getBaseCurrency();
-        BigDecimal reverseRate = BigDecimal.ONE.divide(exchangeRateDto.get().getRate(), 3, RoundingMode.HALF_UP);
+        BigDecimal reverseRate = BigDecimal.ONE.divide(exchangeRateDto.get().getRate(), 5, RoundingMode.HALF_UP);
         BigDecimal convertedAmount = reverseRate.multiply(amount);
+        convertedAmount.setScale(2, RoundingMode.HALF_UP);
 
         exchangeRateDto.get().setBaseCurrency(exchangeRateDto.get().getTargetCurrency());
         exchangeRateDto.get().setTargetCurrency(temp);

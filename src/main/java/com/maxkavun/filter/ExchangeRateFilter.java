@@ -1,16 +1,25 @@
 package com.maxkavun.filter;
 
+import com.google.gson.Gson;
 import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.validator.ExchangeCurrenciesValidator;
+import com.maxkavun.validator.RateAmountValidator;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-@WebFilter("/exchangeRates/*")
+@WebFilter("/exchangeRate/*")
 public class ExchangeRateFilter implements Filter {
-
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -24,59 +33,51 @@ public class ExchangeRateFilter implements Filter {
             response.setContentType("application/json");
             String path = request.getPathInfo();
             int codeLength = 6;
-            if (path == null || path.equals("/")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
 
             path = path.substring(1).toUpperCase();
-
             if (path.length() != codeLength || !path.matches("[A-Z]+")) {
-                ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST ,"The currencies code are incorrect. It must be exactly 6 uppercase letters." );
-            } else {
-                filterChain.doFilter(request, response);
+                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect. It must be exactly 6 uppercase letters.");
+                return;
             }
+            filterChain.doFilter(request, response);
         }
 
 
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
-            String baseCurrencyCode = request.getParameter("baseCurrencyCode");
-            String targetCurrencyCode = request.getParameter("targetCurrencyCode");
-            BigDecimal rate = new BigDecimal(request.getParameter("rate"));
-            int codeLength = 3;
-            if (baseCurrencyCode.length() != codeLength  || targetCurrencyCode.length() != codeLength ||
-                !baseCurrencyCode.matches("[A-Z]+") || !targetCurrencyCode.matches("[A-Z]+") ) {
-                ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Values in form are incorrect");
-            } else {
-                filterChain.doFilter(request, response);
-            }
-        }
-
-
-        if("PATCH".equalsIgnoreCase(request.getMethod())) {
+        if ("PATCH".equalsIgnoreCase(request.getMethod())) {
             String path = request.getPathInfo();
-
             if (path == null || path.equals("/")) {
-                ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , "The currencies code are incorrect " + path);
+                ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect " + path);
                 return;
             }
 
             int codeLength = 6;
-
             path = path.substring(1).toUpperCase();
             if (path.length() != codeLength || !path.matches("[A-Z]+")) {
-                ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , "The currencies code are incorrect " + path);
+                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect " + path);
+                return;
             }
 
-            BigDecimal rate = new BigDecimal(request.getParameter("rate"));
-            if (rate.compareTo(BigDecimal.ZERO) < 0 || rate == null ) {
-                ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Rate in form is incorrect " + rate);
-            }else {
-                filterChain.doFilter(request, response);
+            BufferedReader reader = request.getReader();
+            String body = reader.lines().collect(Collectors.joining());
+            request.setAttribute("requestBody", body);
+
+            Map<String, String> parameters = parseFormData(body);
+
+            String rateStr = parameters.get("rate");
+
+            if (!RateAmountValidator.isValidRate(rateStr)) {
+                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The rate is invalid");
+                return;
             }
+
+            filterChain.doFilter(request, response);
         }
+    }
 
-
-
+    private static Map<String, String> parseFormData(String body) {
+        return Arrays.stream(body.split("&"))
+                .map(param -> param.split("=", 2))
+                .collect(Collectors.toMap(p -> URLDecoder.decode(p[0], StandardCharsets.UTF_8),
+                        p -> URLDecoder.decode(p.length > 1 ? p[1] : "", StandardCharsets.UTF_8)));
     }
 }

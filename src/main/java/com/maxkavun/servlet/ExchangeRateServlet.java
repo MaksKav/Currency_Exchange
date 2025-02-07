@@ -17,67 +17,36 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@WebServlet("/exchangeRates/*")
+@WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService = ExchangeRateServiceFactory.createExchangeRateService();
     private final Gson gson = new Gson();
-    private static final Logger log = LoggerFactory.getLogger(ExchangeRateServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeRateServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             String path = request.getPathInfo();
-            if (path == null || path.equals("/")) {
-                List<ExchangeRateDto> exchangeRateDtoList = exchangeRateService.getAllExchangeRates();
-                log.info("Successfully retrieved all exchangeRates in doGet");
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDtoList));
+            String exchangeRateCode = path.substring(1);
+            Optional<ExchangeRateDto> exchangeRateDto = exchangeRateService.getExchangeRateByCode(exchangeRateCode);
+            if (exchangeRateDto.isPresent()) {
+                LOGGER.info("Successfully retrieved exchange rate in doGet for exchangeRateCode: {}", exchangeRateCode);
+                ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto.get()));
             } else {
-                String exchangeRateCode = path.substring(1);
-                Optional<ExchangeRateDto> exchangeRateDto = exchangeRateService.getExchangeRateByCode(exchangeRateCode);
-                if (exchangeRateDto.isPresent()) {
-                    log.info("Successfully retrieved exchange rate in doGet for exchangeRateCode: {}", exchangeRateCode);
-                    ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto.get()));
-                } else {
-                    log.warn("No exchange rate found for exchangeRateCode: {}", exchangeRateCode);
-                    ResponceUtil.sendResponse(response, HttpServletResponse.SC_NOT_FOUND, "No exchange rate found for exchangeRateCode: " + exchangeRateCode);
-                }
+                LOGGER.warn("No exchange rate found for exchangeRateCode: {}", exchangeRateCode);
+                ResponceUtil.sendResponse(response, HttpServletResponse.SC_NOT_FOUND, "No exchange rate found for exchangeRateCode: " + exchangeRateCode);
             }
+        } catch (NullPointerException e) {
+            LOGGER.error(e.getMessage());
+            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Exchange rate code is null");
         } catch (IOException e) {
-            log.error(e.getMessage());
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson(e));
-        }
-    }
-
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            String baseCurrencyCode = request.getParameter("baseCurrencyCode");
-            String targetCurrencyCode = request.getParameter("targetCurrencyCode");
-            BigDecimal rate = new BigDecimal(request.getParameter("rate"));
-
-            log.info("Attempting to add new exchange rate: baseCurrencyCode={}, targetCurrencyCode={}, rate={}",
-                    baseCurrencyCode, targetCurrencyCode, rate);
-
-            ExchangeRateDto exchangeRateDto = exchangeRateService.addNewExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
-
-            if (exchangeRateDto != null) {
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(exchangeRateDto));
-                log.info("Successfully added new exchange rate: {}", gson.toJson(exchangeRateDto));
-            }
-
-        } catch (CurrencyNotFoundException e) {
-            log.warn("Failed to add exchange rate: {}", e.getMessage());
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        } catch (ExchangeRateAlreadyExistsException e) {
-            log.warn("Failed to add exchange rate: {}", e.getMessage());
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_CONFLICT, e.getMessage());
-        } catch (IOException e) {
-            log.error("An error occurred while adding a new exchange rate: {}", e.getMessage());
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            LOGGER.error(e.getMessage());
+            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopps");
         }
     }
 
@@ -86,15 +55,28 @@ public class ExchangeRateServlet extends HttpServlet {
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             String path = request.getPathInfo().substring(1).toUpperCase();
-            BigDecimal rate = new BigDecimal(request.getParameter("rate"));
+            String body = (String) request.getAttribute("requestBody");
+
+            Map<String, String> parameters = parseFormData(body);
+
+            String rateStr = parameters.get("rate");
+            BigDecimal rate = new BigDecimal(rateStr);
 
             ExchangeRateDto exchangeRateDto = exchangeRateService.updateExchangeRate(path, rate);
-            log.info("Successfully updated exchange rate: {}", exchangeRateDto);
+            LOGGER.info("Successfully updated exchange rate: {}", exchangeRateDto);
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto));
 
         } catch (IOException e) {
-            log.error("Failed to update exchange rate: {}", e.getMessage());
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            LOGGER.error("Failed to update exchange rate: {}", e.getMessage());
+            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update exchange rate");
         }
+    }
+
+
+    private static Map<String, String> parseFormData(String body) {
+        return Arrays.stream(body.split("&"))
+                .map(param -> param.split("=", 2))
+                .collect(Collectors.toMap(p -> URLDecoder.decode(p[0], StandardCharsets.UTF_8),
+                        p -> URLDecoder.decode(p.length > 1 ? p[1] : "", StandardCharsets.UTF_8)));
     }
 }

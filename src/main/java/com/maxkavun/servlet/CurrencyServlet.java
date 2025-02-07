@@ -68,24 +68,25 @@ public class CurrencyServlet extends HttpServlet {
             String code = request.getParameter("code").toUpperCase();
             String sign = request.getParameter("sign");
 
-            if (!CurrencyValidator.validateCurrencyData(name , code, sign)) {
-                ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Invalid currency data");
+            if (!CurrencyValidator.isValidCurrencieData(name , code, sign)) {
+                ResponceUtil.sendErrorResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Invalid currency data");
                 log.warn("The required form field is missing in Currency POST request.");
                 return;
             }
 
+
             if (currencyService.getOptionalCurrencyByCode(code).isPresent()) {
-                ResponceUtil.sendResponse(response , HttpServletResponse.SC_CONFLICT , "Currency already exists");
+                ResponceUtil.sendErrorResponse(response , HttpServletResponse.SC_CONFLICT , "Currency already exists");
                 log.warn("Currency with this code: {}  already exists" , code);
                 return;
             }
 
-            CurrencyDto currencyDto = new CurrencyDto(code, name, sign);
+            CurrencyDto currencyDto = new CurrencyDto(name, code, sign);
             currencyService.addCurrency(currencyDto);
             ResponceUtil.sendResponse(response , HttpServletResponse.SC_CREATED , gson.toJson(currencyDto));
             log.info("Successfully created currency: {}", currencyDto.getCode());
         }catch (Exception e) {
-            ResponceUtil.sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage());
+            ResponceUtil.sendErrorResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,"Ooopss");
             log.error("Error while creating currency from POST ", e);
         }
     }
@@ -94,9 +95,13 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            CurrencyDto currencyDto = gson.fromJson(request.getReader() , CurrencyDto.class);
 
-            if (!CurrencyValidator.validateCurrencyData(currencyDto.getName(), currencyDto.getCode(), currencyDto.getSign())) {
+            String name = request.getParameter("name");
+            String code = request.getParameter("code").toUpperCase();
+            String sign = request.getParameter("sign");
+            CurrencyDto currencyDto = new CurrencyDto(name, code, sign);
+
+            if (!CurrencyValidator.isValidCurrencieData(name, code, sign)) {
                 ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data: one or more fields are incorrect.");
                 log.warn("Validation failed for currency: {}", gson.toJson(currencyDto));
                 return;
@@ -106,13 +111,13 @@ public class CurrencyServlet extends HttpServlet {
             ResponceUtil.sendResponse(response , HttpServletResponse.SC_OK , gson.toJson(currencyDto));
             log.info("Successfully updated currency: {}", currencyDto.getCode());
         } catch (ValidationException e) {
-            ResponceUtil.sendResponse(response , HttpServletResponse.SC_BAD_REQUEST , e.getMessage());
+            ResponceUtil.sendErrorResponse(response , HttpServletResponse.SC_BAD_REQUEST , e.getMessage());
             log.warn("Validation error: {}", e.getMessage());
         } catch (BusinessException e) {
-            ResponceUtil.sendResponse(response , HttpServletResponse.SC_NOT_FOUND , e.getMessage());
+            ResponceUtil.sendErrorResponse(response , HttpServletResponse.SC_NOT_FOUND , e.getMessage());
             log.warn("Business logic error: {}", e.getMessage());
         } catch (Exception e) {
-            ResponceUtil.sendResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
+            ResponceUtil.sendErrorResponse(response , HttpServletResponse.SC_INTERNAL_SERVER_ERROR ,e.getMessage() );
             log.error("Error while updating currency", e);
         }
     }

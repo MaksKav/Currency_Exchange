@@ -50,10 +50,11 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             WHERE id = ?;
             """;
 
-    private static final String UPDATE_BY_ID_SQL = """
+
+    private static final String UPDATE_BY_CODE_SQL = """
             UPDATE Currencies
-            SET code = ?, full_name = ?, sign = ?
-            WHERE id = ?;
+            SET full_name = ?, sign = ?
+            WHERE code = ?;
             """;
 
 
@@ -82,8 +83,8 @@ public class CurrencyDao implements Dao<Integer, Currency> {
         try {
             return new Currency(
                     resultSet.getObject("id", Integer.class),
-                    resultSet.getObject("code", String.class),
                     resultSet.getObject("full_name", String.class),
+                    resultSet.getObject("code", String.class),
                     resultSet.getObject("sign", String.class));
         } catch (SQLException e) {
             log.error("Error building currency from result set", e);
@@ -180,11 +181,10 @@ public class CurrencyDao implements Dao<Integer, Currency> {
     @Override
     public void update(Currency model) {
         try (var connection = ConnectionManager.getConnection();
-             var prepareStatement = connection.prepareStatement(UPDATE_BY_ID_SQL)) {
-            prepareStatement.setString(1, model.getCode());
-            prepareStatement.setString(2, model.getFullName());
-            prepareStatement.setString(3, model.getSign());
-            prepareStatement.setInt(4, model.getId());
+             var prepareStatement = connection.prepareStatement(UPDATE_BY_CODE_SQL)) {
+            prepareStatement.setString(1, model.getFullName());
+            prepareStatement.setString(2, model.getSign());
+            prepareStatement.setString(3, model.getCode());
 
             int rows = prepareStatement.executeUpdate();
             if (rows > 0) {

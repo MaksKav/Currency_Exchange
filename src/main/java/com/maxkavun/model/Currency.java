@@ -9,14 +9,14 @@ public class Currency {
     private String code;
     private String sign;
 
-    public Currency(Integer id, String code, String fullName, String sign) {
+    public Currency(Integer id, String fullName, String code, String sign) {
         this.id = id;
         this.fullName = fullName;
         this.code = code;
         this.sign = sign;
     }
 
-    public Currency(String code, String fullName, String sign) {
+    public Currency(String fullName, String code, String sign) {
         this.fullName = fullName;
         this.code = code;
         this.sign = sign;

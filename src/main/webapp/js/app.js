@@ -1,8 +1,7 @@
 $(document).ready(function () {
-    const host = "http://85.215.155.206:8080/Currency_Exchange"
+    // const host = "http://85.215.155.206:8080/Currency_Exchange"
 
-    // const host = "http://localhost:8080"
-
+    const host = "http://localhost:8080"
 
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {
@@ -131,7 +130,7 @@ $(document).ready(function () {
     });
 
     // add event handler for edit exchange rate modal "Save" button
-    $('#edit-exchange-rate-modal .btn-primary').click(function () {
+    $('#edit-exchange-rate-modal .btn-primary').click(function() {
         // get the currency pair and exchange rate from the modal
         const pair = $('#edit-exchange-rate-modal .modal-title').text().replace('Edit ', '').replace(' Exchange Rate', '');
         const exchangeRate = $('#edit-exchange-rate-modal #exchange-rate-input').val();
@@ -144,12 +143,12 @@ $(document).ready(function () {
         $.ajax({
             url: `${host}/exchangeRate/${pair}`,
             type: "PATCH",
-            contentType: "application/x-www-form-urlencoded",
+            contentType : "application/x-www-form-urlencoded",
             data: `rate=${exchangeRate}`,
-            success: function () {
+            success: function() {
 
             },
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR, textStatus, errorThrown) {
                 const error = JSON.parse(jqXHR.responseText);
                 const toast = $('#api-error-toast');
 
@@ -161,7 +160,6 @@ $(document).ready(function () {
         // close the modal
         $('#edit-exchange-rate-modal').modal('hide');
     });
-
     $("#add-exchange-rate").submit(function (e) {
         e.preventDefault();
 

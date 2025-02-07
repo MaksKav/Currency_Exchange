@@ -29,18 +29,14 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            String path = request.getPathInfo();
-            if (path == null || path.equals("/")) {
-                List<ExchangeRateDto> exchangeRateDtoList = exchangeRatesService.getAllExchangeRates();
-                LOGGER.info("Successfully retrieved all exchangeRates in doGet");
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDtoList));
-            }
+            List<ExchangeRateDto> exchangeRateDtoList = exchangeRatesService.getAllExchangeRates();
+            LOGGER.info("Successfully retrieved all exchangeRates in doGet");
+            ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDtoList));
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopps");
         }
     }
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

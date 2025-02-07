@@ -21,12 +21,11 @@ public class ExchangeRateFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        response.setContentType("application/x-www-form-urlencoded");
         response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
 
 
         if ("GET".equalsIgnoreCase(request.getMethod())) {
-            response.setContentType("application/json");
             String path = request.getPathInfo();
             int codeLength = 6;
 

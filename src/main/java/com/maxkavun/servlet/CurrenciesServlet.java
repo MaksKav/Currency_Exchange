@@ -53,12 +53,6 @@ public class CurrenciesServlet extends HttpServlet {
             String code = request.getParameter("code").toUpperCase();
             String sign = request.getParameter("sign");
 
-            if (!CurrencyValidator.isValidCurrencieData(name, code, sign)) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data");
-                LOGGER.warn("The required form field is missing in Currency POST request.");
-                return;
-            }
-
             if (currencyService.getOptionalCurrencyByCode(code).isPresent()) {
                 ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_CONFLICT, "Currency already exists");
                 LOGGER.warn("Currency with this code: {}  already exists", code);
@@ -80,16 +74,11 @@ public class CurrenciesServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
 
-            String name = request.getParameter("name");
-            String code = request.getParameter("code").toUpperCase();
-            String sign = request.getParameter("sign");
-            CurrencyDto currencyDto = new CurrencyDto(name, code, sign);
+            String name = (String) request.getAttribute("name");
+            String code = (String) request.getAttribute("code");
+            String sign = (String) request.getAttribute("sign");
 
-            if (!CurrencyValidator.isValidCurrencieData(name, code, sign)) {
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data: one or more fields are incorrect.");
-                LOGGER.warn("Validation failed for currency: {}", gson.toJson(currencyDto));
-                return;
-            }
+            CurrencyDto currencyDto = new CurrencyDto(name, code, sign);
 
             currencyService.updateCurrency(currencyDto);
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(currencyDto));

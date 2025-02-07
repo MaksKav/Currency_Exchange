@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Optional;
 
 
-@WebServlet("/currencies/*")
-public class CurrencyServlet extends HttpServlet {
+@WebServlet("/currencies")
+public class CurrenciesServlet extends HttpServlet {
     private final CurrencyService currencyService  = new CurrencyService();
     private final Gson gson = new Gson();
-    private static final Logger log = LoggerFactory.getLogger(CurrencyServlet.class);
+    private static final Logger log = LoggerFactory.getLogger(CurrenciesServlet.class);
 
 
     @Override

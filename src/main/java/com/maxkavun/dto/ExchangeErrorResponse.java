@@ -1,10 +1,10 @@
 package com.maxkavun.dto;
 
-public class ExchangeConvertErrorResponse {
+public class ExchangeErrorResponse {
 
     private final String message;
 
-    public ExchangeConvertErrorResponse(String message) {
+    public ExchangeErrorResponse(String message) {
         this.message = message;
     }
 

@@ -1,6 +1,5 @@
 package com.maxkavun.filter;
 
-import com.google.gson.Gson;
 import com.maxkavun.util.ResponceUtil;
 import com.maxkavun.validator.ExchangeCurrenciesValidator;
 import com.maxkavun.validator.RateAmountValidator;

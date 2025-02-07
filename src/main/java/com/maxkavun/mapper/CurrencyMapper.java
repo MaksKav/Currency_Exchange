@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class CurrencyMapper {
-    private static final Logger log = LoggerFactory.getLogger(CurrencyMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CurrencyMapper.class);
 
 
     public CurrencyDto toDto(Currency model) throws ModelToDtoConversionException {
@@ -25,7 +25,7 @@ public class CurrencyMapper {
 
     public List<CurrencyDto> toDtoList(List<Currency> models) throws ModelToDtoConversionException {
         if (models == null || models.isEmpty()) {
-            log.warn("Cannot convert models list to DTO in mapper,  models is null or empty");
+            LOGGER.warn("Cannot convert models list to DTO in mapper,  models is null or empty");
             return Collections.emptyList();
         }
         List<CurrencyDto> currencyDtoList = new ArrayList<>();

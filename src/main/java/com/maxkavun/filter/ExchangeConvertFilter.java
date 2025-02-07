@@ -1,7 +1,5 @@
 package com.maxkavun.filter;
 
-import com.google.gson.Gson;
-import com.maxkavun.dto.ExchangeErrorResponse;
 import com.maxkavun.validator.RateAmountValidator;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -10,11 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.maxkavun.util.ResponceUtil;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+
 
 @WebFilter("/exchange")
 public class ExchangeConvertFilter implements Filter {
-    private final Gson gson = new Gson();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {

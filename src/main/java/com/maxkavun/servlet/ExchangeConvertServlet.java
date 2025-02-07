@@ -26,7 +26,7 @@ public class ExchangeConvertServlet extends HttpServlet {
 
     private final ExchangeRateService exchangeRateService = ExchangeRateServiceFactory.createExchangeRateService();
     private final Gson gson = new Gson();
-    private static final Logger log = LoggerFactory.getLogger(ExchangeConvertServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeConvertServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -40,15 +40,15 @@ public class ExchangeConvertServlet extends HttpServlet {
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(new ExchangeConvertDtoCustom(resultExchange)));
 
         }catch (NumberFormatException e ){
-            log.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
             ResponceUtil.sendResponse(response,HttpServletResponse.SC_BAD_REQUEST , errorMessage);
         } catch (CurrencyNotFoundException e) {
-            log.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
             ResponceUtil.sendResponse(response,HttpServletResponse.SC_NOT_FOUND , errorMessage);
         } catch (IOException | BusinessException  |DataAccessException e) {
-            log.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
             ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage);
         }

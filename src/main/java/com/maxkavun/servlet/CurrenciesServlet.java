@@ -5,8 +5,7 @@ import com.maxkavun.exception.BusinessException;
 import com.maxkavun.exception.ModelToDtoConversionException;
 import com.maxkavun.exception.ValidationException;
 import com.maxkavun.service.CurrencyService;
-import com.maxkavun.util.ResponceUtil;
-import com.maxkavun.validator.CurrencyValidator;
+import com.maxkavun.util.ResponseUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,17 +29,17 @@ public class CurrenciesServlet extends HttpServlet {
             String pathInfo = request.getPathInfo();
             if (pathInfo == null || pathInfo.equals("/")) {
                 List<CurrencyDto> currencies = currencyService.getAllCurrencies();
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(currencies));
+                ResponseUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(currencies));
                 LOGGER.info("Successfully retrieved all currencies in doGet.");
             }
         } catch (IOException e) {
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             LOGGER.error("Error while retrieving currencies.", e);
         } catch (ModelToDtoConversionException e) {
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             LOGGER.error("Error while retrieving currencies in ModelToDtoConversation.", e);
         } catch (BusinessException e) {
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             LOGGER.error("Error while retrieving currencies in BusinessException.", e);
         }
     }
@@ -54,17 +53,17 @@ public class CurrenciesServlet extends HttpServlet {
             String sign = request.getParameter("sign");
 
             if (currencyService.getOptionalCurrencyByCode(code).isPresent()) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_CONFLICT, "Currency already exists");
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_CONFLICT, "Currency already exists");
                 LOGGER.warn("Currency with this code: {}  already exists", code);
                 return;
             }
 
             CurrencyDto currencyDto = new CurrencyDto(name, code, sign);
             currencyService.addCurrency(currencyDto);
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(currencyDto));
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(currencyDto));
             LOGGER.info("Successfully created currency: {}", currencyDto.getCode());
         } catch (Exception e) {
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopss");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopss");
             LOGGER.error("Error while creating currency from POST ", e);
         }
     }
@@ -81,16 +80,16 @@ public class CurrenciesServlet extends HttpServlet {
             CurrencyDto currencyDto = new CurrencyDto(name, code, sign);
 
             currencyService.updateCurrency(currencyDto);
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(currencyDto));
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(currencyDto));
             LOGGER.info("Successfully updated currency: {}", currencyDto.getCode());
         } catch (ValidationException e) {
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             LOGGER.warn("Validation error: {}", e.getMessage());
         } catch (BusinessException e) {
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
             LOGGER.warn("Business logic error: {}", e.getMessage());
         } catch (Exception e) {
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             LOGGER.error("Error while updating currency", e);
         }
     }

@@ -1,6 +1,6 @@
 package com.maxkavun.filter;
 
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import com.maxkavun.validator.ExchangeCurrenciesValidator;
 import com.maxkavun.validator.RateAmountValidator;
 import jakarta.servlet.*;
@@ -31,16 +31,16 @@ public class ExchangeRatesFilter implements Filter {
                 String rateStr = request.getParameter("rate");
 
                 if (!ExchangeCurrenciesValidator.isCurrenciesCodeValid(baseCurrencyCode , targetCurrencyCode)){
-                    ResponceUtil.sendErrorResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Currencies are invalid");
+                    ResponseUtil.sendErrorResponse(response , HttpServletResponse.SC_BAD_REQUEST , "Currencies are invalid");
                     return;
                 }
 
                 if (!RateAmountValidator.isValidRate(rateStr)) {
-                    ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The rate is invalid");
+                    ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The rate is invalid");
                     return;
                 }
             } catch (NumberFormatException | NullPointerException e) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Rate must be a valid number");
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Rate must be a valid number");
                 return;
             }
             filterChain.doFilter(request, response);

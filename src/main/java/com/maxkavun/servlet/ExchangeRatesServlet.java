@@ -6,7 +6,7 @@ import com.maxkavun.exception.CurrencyNotFoundException;
 import com.maxkavun.exception.ExchangeRateAlreadyExistsException;
 import com.maxkavun.factory.ExchangeRateServiceFactory;
 import com.maxkavun.service.ExchangeRateService;
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -31,10 +31,10 @@ public class ExchangeRatesServlet extends HttpServlet {
         try {
             List<ExchangeRateDto> exchangeRateDtoList = exchangeRatesService.getAllExchangeRates();
             LOGGER.info("Successfully retrieved all exchangeRates in doGet");
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDtoList));
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDtoList));
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopps");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopps");
         }
     }
 
@@ -49,17 +49,17 @@ public class ExchangeRatesServlet extends HttpServlet {
             ExchangeRateDto exchangeRateDto = exchangeRatesService.addNewExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
 
             if (exchangeRateDto != null) {
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(exchangeRateDto));
+                ResponseUtil.sendResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(exchangeRateDto));
                 LOGGER.info("Successfully added new exchange rate: {}", gson.toJson(exchangeRateDto));
             }
 
         } catch (CurrencyNotFoundException e) {
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found in database");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "Currency not found in database");
         } catch (ExchangeRateAlreadyExistsException e) {
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_CONFLICT, "This exchange rate is exist");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_CONFLICT, "This exchange rate is exist");
         } catch (IOException e) {
             LOGGER.error("An error occurred while adding a new exchange rate: {}", e.getMessage());
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooops an error occurred while adding a new exchange rate ");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooops an error occurred while adding a new exchange rate ");
         }
     }
 

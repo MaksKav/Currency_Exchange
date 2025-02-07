@@ -6,10 +6,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-public class ResponceUtil {
+public class ResponseUtil {
     private static final Gson gson = new Gson();
 
-    private ResponceUtil() {
+    private ResponseUtil() {
     }
 
     public static  void sendResponse(HttpServletResponse response, int status, String message) throws IOException {

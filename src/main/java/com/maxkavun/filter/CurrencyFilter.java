@@ -1,6 +1,6 @@
 package com.maxkavun.filter;
 
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,11 +23,11 @@ public class CurrencyFilter implements Filter {
             String code = pathInfo.substring(1).toUpperCase();
 
             if (!code.matches("^[A-Za-z]{3}$")) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency code");
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency code");
                 return;
             }
         } catch (NullPointerException e) {
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency code");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency code");
             return;
         }
 

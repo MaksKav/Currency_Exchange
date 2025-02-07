@@ -1,7 +1,7 @@
 package com.maxkavun.filter;
 
 import com.google.gson.Gson;
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import com.maxkavun.validator.CurrencyValidator;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -30,7 +30,7 @@ public class CurrenciesContentTypeFilter implements Filter {
             String sign = request.getParameter("sign");
 
             if (!CurrencyValidator.isValidCurrencieData(name, code, sign)) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data");
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data");
                 return;
             }
         }
@@ -56,7 +56,7 @@ public class CurrenciesContentTypeFilter implements Filter {
             }
 
             if (!CurrencyValidator.isValidCurrencieData(name, code, sign)) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data");
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid currency data");
                 return;
             }
 

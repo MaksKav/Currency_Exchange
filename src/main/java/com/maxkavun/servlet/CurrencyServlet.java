@@ -5,7 +5,7 @@ import com.maxkavun.dto.CurrencyDto;
 import com.maxkavun.exception.BusinessException;
 import com.maxkavun.exception.ModelToDtoConversionException;
 import com.maxkavun.service.CurrencyService;
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -31,21 +31,21 @@ public class CurrencyServlet extends HttpServlet {
             Optional<CurrencyDto> currencyDto = currencyService.getOptionalCurrencyByCode(code);
 
             if (currencyDto.isPresent()) {
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(currencyDto));
+                ResponseUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(currencyDto));
                 LOGGER.info("Successfully retrieved currencyOptional by code: {}", code);
             } else {
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_NOT_FOUND, "Not found currency");
+                ResponseUtil.sendResponse(response, HttpServletResponse.SC_NOT_FOUND, "Not found currency");
                 LOGGER.warn("Currency not found: {}", code);
             }
 
         } catch (ModelToDtoConversionException e) {
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             LOGGER.error("Error while retrieving currencies in ModelToDtoConversation.", e);
         } catch (BusinessException e) {
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             LOGGER.error("Error while retrieving currencies in BusinessException.", e);
         } catch (IOException e) {
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             LOGGER.error("Error while retrieving currencies.", e);
         }
     }

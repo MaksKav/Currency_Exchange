@@ -9,7 +9,7 @@ import com.maxkavun.exception.CurrencyNotFoundException;
 import com.maxkavun.exception.DataAccessException;
 import com.maxkavun.factory.ExchangeRateServiceFactory;
 import com.maxkavun.service.ExchangeRateService;
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -37,20 +37,20 @@ public class ExchangeConvertServlet extends HttpServlet {
 
 
             ExchangeConvertDto resultExchange = exchangeRateService.calculateExchange(fromCurrency, toCurrency, amount);
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(new ExchangeConvertDtoCustom(resultExchange)));
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(new ExchangeConvertDtoCustom(resultExchange)));
 
         }catch (NumberFormatException e ){
             LOGGER.error(e.getMessage());
             String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
-            ResponceUtil.sendResponse(response,HttpServletResponse.SC_BAD_REQUEST , errorMessage);
+            ResponseUtil.sendResponse(response,HttpServletResponse.SC_BAD_REQUEST , errorMessage);
         } catch (CurrencyNotFoundException e) {
             LOGGER.error(e.getMessage());
             String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
-            ResponceUtil.sendResponse(response,HttpServletResponse.SC_NOT_FOUND , errorMessage);
+            ResponseUtil.sendResponse(response,HttpServletResponse.SC_NOT_FOUND , errorMessage);
         } catch (IOException | BusinessException  |DataAccessException e) {
             LOGGER.error(e.getMessage());
             String errorMessage =  gson.toJson(new ExchangeErrorResponse(e.getMessage()));
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage);
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage);
         }
 
     }

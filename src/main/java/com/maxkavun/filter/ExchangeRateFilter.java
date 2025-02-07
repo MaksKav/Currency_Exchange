@@ -1,6 +1,6 @@
 package com.maxkavun.filter;
 
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import com.maxkavun.validator.RateAmountValidator;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -31,7 +31,7 @@ public class ExchangeRateFilter implements Filter {
 
             path = path.substring(1).toUpperCase();
             if (path.length() != codeLength || !path.matches("[A-Z]+")) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect. It must be exactly 6 uppercase letters.");
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect. It must be exactly 6 uppercase letters.");
                 return;
             }
             filterChain.doFilter(request, response);
@@ -41,14 +41,14 @@ public class ExchangeRateFilter implements Filter {
         if ("PATCH".equalsIgnoreCase(request.getMethod())) {
             String path = request.getPathInfo();
             if (path == null || path.equals("/")) {
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect " + path);
+                ResponseUtil.sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect " + path);
                 return;
             }
 
             int codeLength = 6;
             path = path.substring(1).toUpperCase();
             if (path.length() != codeLength || !path.matches("[A-Z]+")) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect " + path);
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The currencies code are incorrect " + path);
                 return;
             }
 
@@ -61,7 +61,7 @@ public class ExchangeRateFilter implements Filter {
             String rateStr = parameters.get("rate");
 
             if (!RateAmountValidator.isValidRate(rateStr)) {
-                ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The rate is invalid");
+                ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "The rate is invalid");
                 return;
             }
 

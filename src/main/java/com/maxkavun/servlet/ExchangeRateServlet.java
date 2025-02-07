@@ -2,11 +2,9 @@ package com.maxkavun.servlet;
 
 import com.google.gson.Gson;
 import com.maxkavun.dto.ExchangeRateDto;
-import com.maxkavun.exception.CurrencyNotFoundException;
-import com.maxkavun.exception.ExchangeRateAlreadyExistsException;
 import com.maxkavun.factory.ExchangeRateServiceFactory;
 import com.maxkavun.service.ExchangeRateService;
-import com.maxkavun.util.ResponceUtil;
+import com.maxkavun.util.ResponseUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -36,17 +34,17 @@ public class ExchangeRateServlet extends HttpServlet {
             Optional<ExchangeRateDto> exchangeRateDto = exchangeRateService.getExchangeRateByCode(exchangeRateCode);
             if (exchangeRateDto.isPresent()) {
                 LOGGER.info("Successfully retrieved exchange rate in doGet for exchangeRateCode: {}", exchangeRateCode);
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto.get()));
+                ResponseUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto.get()));
             } else {
                 LOGGER.warn("No exchange rate found for exchangeRateCode: {}", exchangeRateCode);
-                ResponceUtil.sendResponse(response, HttpServletResponse.SC_NOT_FOUND, "No exchange rate found for exchangeRateCode: " + exchangeRateCode);
+                ResponseUtil.sendResponse(response, HttpServletResponse.SC_NOT_FOUND, "No exchange rate found for exchangeRateCode: " + exchangeRateCode);
             }
         } catch (NullPointerException e) {
             LOGGER.error(e.getMessage());
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Exchange rate code is null");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Exchange rate code is null");
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopps");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ooopps");
         }
     }
 
@@ -64,11 +62,11 @@ public class ExchangeRateServlet extends HttpServlet {
 
             ExchangeRateDto exchangeRateDto = exchangeRateService.updateExchangeRate(path, rate);
             LOGGER.info("Successfully updated exchange rate: {}", exchangeRateDto);
-            ResponceUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto));
+            ResponseUtil.sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(exchangeRateDto));
 
         } catch (IOException e) {
             LOGGER.error("Failed to update exchange rate: {}", e.getMessage());
-            ResponceUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update exchange rate");
+            ResponseUtil.sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update exchange rate");
         }
     }
 

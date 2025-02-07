@@ -20,13 +20,13 @@ public class CurrencyService {
     public CurrencyService() {
     }
 
-    public List<CurrencyDto> getAllCurrencies() throws ModelToDtoConversionException {
+    public List<CurrencyDto> getAllCurrencies()  {
         List<Currency> currencies = currencyDao.findAll();
         return mapper.toDtoList(currencies);
     }
 
 
-    public Optional<CurrencyDto> getOptionalCurrencyByCode(String code) throws BusinessException, ModelToDtoConversionException {
+    public Optional<CurrencyDto> getOptionalCurrencyByCode(String code) {
         Optional<Currency> currencyOptional = currencyDao.findByCode(code);
         if (currencyOptional.isPresent()) {
             Currency currency = currencyOptional.get();
@@ -37,14 +37,14 @@ public class CurrencyService {
     }
 
 
-    public void addCurrency(CurrencyDto currencyDto) throws ValidationException {
+    public void addCurrency(CurrencyDto currencyDto) {
         checkCurrencyUniqueness(currencyDto.getCode());
         Currency currency = new Currency(currencyDto.getId(), currencyDto.getName(), currencyDto.getCode(), currencyDto.getSign());
         currencyDao.save(currency);
     }
 
 
-    public void updateCurrency(CurrencyDto currencyDto) throws ValidationException, BusinessException, DtoToModelConversionException {
+    public void updateCurrency(CurrencyDto currencyDto) {
         Optional<Currency> optionalCurrency = currencyDao.findByCode(currencyDto.getCode());
         if (!optionalCurrency.isPresent()) {
             throw new BusinessException("Failed update Currency , Currency not found in DB " + currencyDto);
@@ -54,7 +54,7 @@ public class CurrencyService {
     }
 
 
-    private void checkCurrencyUniqueness(String code) throws ValidationException {
+    private void checkCurrencyUniqueness(String code) {
         if (currencyDao.findByCode(code).isPresent()) {
             throw new ValidationException("Currency with this code already exists " + code);
         }

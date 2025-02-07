@@ -72,10 +72,9 @@ public class CurrencyDao implements Dao<Integer, Currency> {
             log.info("Fetched all currencies: {}", currencies);
             return currencies.isEmpty() ? Collections.emptyList() : currencies;
 
-        } catch (SQLException e) {
+        } catch (DataAccessException | SQLException e) {
             log.error("Error fetching all currencies", e);
             throw new DataAccessException("Failed to fetch all currencies from the database in FindAll method " + e.getMessage());
-
         }
     }
 
